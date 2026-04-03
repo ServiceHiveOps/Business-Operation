@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Hive — Business Operations</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0f;
+  --surface: #181818;
+  --surface2: #222222;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0ede8;
+  --muted: #888;
+  --accent: #c8f55a;
+  --accent-dark: #a8d43a;
+  --danger: #ff5c5c;
+  --warning: #f5a623;
+  --info: #5ab4ff;
+  --radius: 10px;
+  --mono: 'DM Mono', monospace;
+  --sans: 'Syne', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* Layout */
+.app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-hex {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-name { font-size: 15px; font-weight: 700; letter-spacing: 0.02em; color: var(--text); }
+.logo-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.08em; }
+.nav-section { display: flex; flex-direction: column; gap: 2px; }
+.nav-label { font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.1em; padding: 0 8px; margin-bottom: 6px; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--surface2); color: var(--accent); }
+.nav-item .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.nav-item.active .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.nav-coming { opacity: 0.4; pointer-events: none; }
+.coming-badge {
+  font-size: 9px;
+  font-family: var(--mono);
+  background: var(--surface2);
+  color: var(--muted);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: auto;
+  border: 1px solid var(--border);
+}
+.sidebar-footer { margin-top: auto; }
+.budget-pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-family: var(--mono);
+}
+.budget-pill-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; letter-spacing: 0.08em; }
+.budget-pill-value { font-size: 20px; font-weight: 500; color: var(--accent); }
+.budget-pill-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* Main */
+.main { padding: 36px 40px; overflow-y: auto; }
+.page-header { margin-bottom: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+/* Summary bar */
+.summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--card-accent, var(--border2));
+}
+.stat-card.green::before { background: var(--accent); }
+.stat-card.red::before { background: var(--danger); }
+.stat-card.blue::before { background: var(--info); }
+.stat-label { font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.08em; margin-bottom: 8px; }
+.stat-value { font-size: 28px; font-weight: 700; font-family: var(--mono); color: var(--text); }
+.stat-value.accent { color: var(--accent); }
+.stat-value.danger { color: var(--danger); }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* Progress bar */
+.progress-wrap { margin-bottom: 32px; }
+.progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-size: 11px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.06em; }
+.progress-pct { font-size: 12px; font-family: var(--mono); color: var(--text); font-weight: 500; }
+.progress-track {
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.4s ease, background 0.3s;
+}
+.progress-fill.warn { background: var(--warning); }
+.progress-fill.over { background: var(--danger); }
+
+/* Section */
+.section { margin-bottom: 36px; }
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.section-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.04em; }
+.section-total { font-size: 12px; font-family: var(--mono); color: var(--muted); }
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--sans);
+  font-weight: 500;
+  color: var(--accent);
+  background: rgba(200,245,90,0.08);
+  border: 1px solid rgba(200,245,90,0.2);
+  border-radius: 6px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.add-btn:hover { background: rgba(200,245,90,0.15); border-color: rgba(200,245,90,0.35); }
+
+/* Table */
+.table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 100px 80px 36px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: var(--surface2); }
+.table-row.header-row {
+  background: var(--surface2);
+  padding: 8px 16px;
+}
+.table-row.header-row:hover { background: var(--surface2); }
+.col-label { font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.08em; }
+.item-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-family: var(--mono);
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-top: 3px;
+}
+.badge-fulltime { background: rgba(90,180,255,0.12); color: #5ab4ff; border: 1px solid rgba(90,180,255,0.2); }
+.badge-parttime { background: rgba(200,245,90,0.1); color: #c8f55a; border: 1px solid rgba(200,245,90,0.2); }
+.badge-freelance { background: rgba(245,166,35,0.1); color: #f5a623; border: 1px solid rgba(245,166,35,0.2); }
+.badge-tool { background: rgba(160,120,255,0.1); color: #b08fff; border: 1px solid rgba(160,120,255,0.2); }
+.badge-subscription { background: rgba(255,92,92,0.1); color: #ff8080; border: 1px solid rgba(255,92,92,0.2); }
+.inline-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--mono);
+  padding: 4px 6px;
+  border-radius: 6px;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+}
+.inline-select:focus { border-color: var(--accent); }
+.inline-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--mono);
+  padding: 4px 8px;
+  border-radius: 6px;
+  width: 100%;
+  text-align: right;
+  outline: none;
+}
+.inline-input:focus { border-color: var(--accent); }
+.del-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s;
+}
+.del-btn:hover { background: rgba(255,92,92,0.1); border-color: rgba(255,92,92,0.2); color: var(--danger); }
+.empty-row {
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  font-family: var(--mono);
+  text-align: center;
+}
+
+/* Modal */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 28px;
+  width: 360px;
+  max-width: 90vw;
+  animation: modalIn 0.18s ease;
+}
+@keyframes modalIn { from { opacity:0; transform:translateY(8px) scale(0.98); } to { opacity:1; transform:none; } }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 20px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 10px; font-family: var(--mono); color: var(--muted); letter-spacing: 0.08em; margin-bottom: 6px; }
+.field input, .field select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  font-size: 14px;
+  font-family: var(--sans);
+  padding: 9px 12px;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field input:focus, .field select:focus { border-color: var(--accent); }
+.field select option { background: var(--surface); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.btn-cancel {
+  background: none;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn-cancel:hover { border-color: var(--text); color: var(--text); }
+.btn-confirm {
+  background: var(--accent);
+  border: none;
+  color: #0f0f0f;
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-confirm:hover { background: var(--accent-dark); }
+
+/* Security notice */
+.security-notice {
+  background: rgba(90,180,255,0.06);
+  border: 1px solid rgba(90,180,255,0.15);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--muted);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.security-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--info); flex-shrink: 0; }
+
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { height: auto; position: relative; }
+  .main { padding: 24px 20px; }
+  .summary-grid { grid-template-columns: 1fr 1fr; }
+  .table-row { grid-template-columns: 1fr 80px 32px; }
+  .col-type, .col-amount { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-hex"></div>
+      <div>
+        <div class="logo-name">ServiceHive</div>
+        <div class="logo-sub">OPS PLATFORM</div>
+      </div>
+    </div>
+
+    <nav class="nav-section">
+      <div class="nav-label">MODULES</div>
+      <button class="nav-item active">
+        <span class="dot"></span> Budget tracker
+      </button>
+      <button class="nav-item nav-coming">
+        <span class="dot"></span> Client tracker
+        <span class="coming-badge">SOON</span>
+      </button>
+      <button class="nav-item nav-coming">
+        <span class="dot"></span> Task manager
+        <span class="coming-badge">SOON</span>
+      </button>
+      <button class="nav-item nav-coming">
+        <span class="dot"></span> Invoices
+        <span class="coming-badge">SOON</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="budget-pill">
+        <div class="budget-pill-label">MONTHLY BUDGET</div>
+        <div class="budget-pill-value" id="sidebar-remaining">$1,000</div>
+        <div class="budget-pill-sub" id="sidebar-sub">remaining</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-title">Budget tracker</div>
+      <div class="page-sub">ServiceHiveOps / Business-Operation · data saved locally</div>
+    </div>
+
+    <div class="security-notice">
+      <div class="security-dot"></div>
+      All data is stored in your browser only. Nothing is sent to any server. Safe &amp; private.
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="stat-card blue">
+        <div class="stat-label">TOTAL BUDGET</div>
+        <div class="stat-value accent" id="s-budget">$1,000</div>
+        <div class="stat-sub">monthly allocation</div>
+      </div>
+      <div class="stat-card" id="spent-card">
+        <div class="stat-label">TOTAL SPENT</div>
+        <div class="stat-value" id="s-spent">$0</div>
+        <div class="stat-sub" id="s-spent-pct">0% of budget</div>
+      </div>
+      <div class="stat-card green" id="rem-card">
+        <div class="stat-label">REMAINING</div>
+        <div class="stat-value accent" id="s-remaining">$1,000</div>
+        <div class="stat-sub" id="s-rem-sub">you're good</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">BUDGET USED</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Team section -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Team</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-total" id="team-total">$0 / mo</span>
+          <button class="add-btn" onclick="openModal('team')">+ Add person</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-row header-row">
+          <div class="col-label">NAME / ROLE</div>
+          <div class="col-label col-type">TYPE</div>
+          <div class="col-label" style="text-align:right">MONTHLY ($)</div>
+          <div class="col-label" style="text-align:right">% OF BUDGET</div>
+          <div></div>
+        </div>
+        <div id="team-list"></div>
+      </div>
+    </div>
+
+    <!-- Tools section -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Tools &amp; subscriptions</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="section-total" id="tools-total">$0 / mo</span>
+          <button class="add-btn" onclick="openModal('tools')">+ Add item</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-row header-row">
+          <div class="col-label">TOOL / SERVICE</div>
+          <div class="col-label col-type">TYPE</div>
+          <div class="col-label" style="text-align:right">MONTHLY ($)</div>
+          <div class="col-label" style="text-align:right">% OF BUDGET</div>
+          <div></div>
+        </div>
+        <div id="tools-list"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add team member</div>
+    <div class="field">
+      <label>NAME / ROLE</label>
+      <input type="text" id="m-name" placeholder="e.g. Frontend developer">
+    </div>
+    <div class="field" id="type-field">
+      <label>TYPE</label>
+      <select id="m-type">
+        <option value="fulltime">Full-time employee</option>
+        <option value="parttime">Part-time employee</option>
+        <option value="freelance">Freelancer / contractor</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>MONTHLY COST (USD)</label>
+      <input type="number" id="m-amount" placeholder="0" min="0">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="addItem()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BUDGET = 1000;
+const STORAGE_KEY = 'servicehive_budget_v1';
+let mode = 'team';
+let data = { team: [], tools: [] };
+let nextId = 1;
+
+function load() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      data = parsed.data || { team: [], tools: [] };
+      nextId = parsed.nextId || 1;
+    } else {
+      data = {
+        team: [
+          { id: nextId++, name: 'Project manager', type: 'parttime', amount: 300 },
+          { id: nextId++, name: 'Developer', type: 'freelance', amount: 250 }
+        ],
+        tools: [
+          { id: nextId++, name: 'Hosting (Vercel)', type: 'tool', amount: 20 },
+          { id: nextId++, name: 'Email service', type: 'subscription', amount: 15 }
+        ]
+      };
+      save();
+    }
+  } catch(e) {}
+}
+
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ data, nextId })); } catch(e) {}
+}
+
+function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+function pct(n) { return Math.round((n / BUDGET) * 100) + '%'; }
+
+const BADGE_MAP = {
+  fulltime: ['badge-fulltime', 'Full-time'],
+  parttime: ['badge-parttime', 'Part-time'],
+  freelance: ['badge-freelance', 'Freelancer'],
+  tool: ['badge-tool', 'Tool'],
+  subscription: ['badge-subscription', 'Subscription']
+};
+
+function render() {
+  const teamTotal = data.team.reduce((s, i) => s + Number(i.amount), 0);
+  const toolsTotal = data.tools.reduce((s, i) => s + Number(i.amount), 0);
+  const spent = teamTotal + toolsTotal;
+  const rem = BUDGET - spent;
+  const usedPct = Math.min(100, Math.round((spent / BUDGET) * 100));
+
+  document.getElementById('s-budget').textContent = fmt(BUDGET);
+  document.getElementById('s-spent').textContent = fmt(spent);
+  document.getElementById('s-spent-pct').textContent = pct(spent) + ' of budget';
+
+  const remEl = document.getElementById('s-remaining');
+  remEl.textContent = fmt(Math.abs(rem));
+  remEl.className = 'stat-value ' + (rem < 0 ? 'danger' : 'accent');
+  document.getElementById('s-rem-sub').textContent = rem < 0 ? 'over budget!' : 'you\'re good';
+
+  const remCard = document.getElementById('rem-card');
+  remCard.className = 'stat-card ' + (rem < 0 ? 'red' : 'green');
+
+  document.getElementById('progress-pct').textContent = usedPct + '%';
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = usedPct + '%';
+  fill.className = 'progress-fill' + (usedPct >= 100 ? ' over' : usedPct >= 75 ? ' warn' : '');
+
+  document.getElementById('team-total').textContent = fmt(teamTotal) + ' / mo';
+  document.getElementById('tools-total').textContent = fmt(toolsTotal) + ' / mo';
+
+  document.getElementById('sidebar-remaining').textContent = fmt(Math.max(0, rem));
+  document.getElementById('sidebar-sub').textContent = rem < 0 ? '⚠ over budget' : 'remaining';
+
+  ['team', 'tools'].forEach(section => {
+    const el = document.getElementById(section + '-list');
+    if (!data[section].length) {
+      el.innerHTML = '<div class="empty-row">No items yet — click + Add to get started.</div>';
+      return;
+    }
+    el.innerHTML = data[section].map(item => {
+      const [badgeCls, badgeLabel] = BADGE_MAP[item.type] || ['badge-tool', item.type];
+      const itemPct = Math.round((Number(item.amount) / BUDGET) * 100);
+      const typeOpts = section === 'team'
+        ? ['fulltime', 'parttime', 'freelance']
+        : ['tool', 'subscription'];
+      const selectHtml = `<select class="inline-select" onchange="changeType(${item.id},'${section}',this.value)">${typeOpts.map(t => `<option value="${t}" ${item.type===t?'selected':''}>${BADGE_MAP[t][1]}</option>`).join('')}</select>`;
+      return `<div class="table-row">
+        <div>
+          <div class="item-name">${escHtml(item.name)}</div>
+          <span class="badge ${badgeCls}">${badgeLabel}</span>
+        </div>
+        <div class="col-type">${selectHtml}</div>
+        <div><input type="number" class="inline-input" value="${item.amount}" min="0" onchange="changeAmount(${item.id},'${section}',this.value)"></div>
+        <div style="text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)">${itemPct}%</div>
+        <button class="del-btn" onclick="deleteItem(${item.id},'${section}')">×</button>
+      </div>`;
+    }).join('');
+  });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function changeType(id, section, val) {
+  const item = data[section].find(i => i.id === id);
+  if (item) { item.type = val; save(); render(); }
+}
+function changeAmount(id, section, val) {
+  const item = data[section].find(i => i.id === id);
+  if (item) { item.amount = Math.max(0, Number(val) || 0); save(); render(); }
+}
+function deleteItem(id, section) {
+  data[section] = data[section].filter(i => i.id !== id);
+  save(); render();
+}
+function openModal(m) {
+  mode = m;
+  document.getElementById('modal-title').textContent = m === 'team' ? 'Add team member' : 'Add tool / subscription';
+  document.getElementById('m-name').value = '';
+  document.getElementById('m-amount').value = '';
+  const sel = document.getElementById('m-type');
+  sel.innerHTML = m === 'team'
+    ? '<option value="fulltime">Full-time employee</option><option value="parttime">Part-time employee</option><option value="freelance">Freelancer / contractor</option>'
+    : '<option value="tool">Tool</option><option value="subscription">Subscription</option>';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(() => document.getElementById('m-name').focus(), 80);
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+function addItem() {
+  const name = document.getElementById('m-name').value.trim();
+  const type = document.getElementById('m-type').value;
+  const amount = Math.max(0, Number(document.getElementById('m-amount').value) || 0);
+  if (!name) { document.getElementById('m-name').focus(); return; }
+  data[mode].push({ id: nextId++, name, type, amount });
+  save(); closeModal(); render();
+}
+document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('modal').classList.contains('open')) addItem();
+});
+
+load();
+render();
+</script>
+</body>
+</html>
