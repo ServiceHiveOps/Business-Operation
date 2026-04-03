@@ -6,27 +6,12 @@
 <title>Service Hive — Operations Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* DARK MODE (default) */
-:root{
-  --bg:#0f0f0f;--surface:#181818;--surface2:#222;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
-  --text:#f0ede8;--muted:#888;
-  --accent:#c8f55a;--accent-dark:#a8d43a;
-  --danger:#ff5c5c;--warning:#f5a623;--info:#5ab4ff;
-  --mono:'DM Mono',monospace;--sans:'Syne',sans-serif;--radius:10px;
-}
-/* LIGHT MODE */
-[data-theme="light"]{
-  --bg:#f4f4f0;--surface:#ffffff;--surface2:#eeede8;
-  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
-  --text:#1a1a18;--muted:#666;
-  --accent:#4a7a10;--accent-dark:#3a6a00;
-  --danger:#cc2200;--warning:#996600;--info:#1a5fa0;
-}
+:root{--bg:#0f0f0f;--surface:#181818;--surface2:#222;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0ede8;--muted:#888;--accent:#c8f55a;--accent-dark:#a8d43a;--danger:#ff5c5c;--warning:#f5a623;--info:#5ab4ff;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif;--radius:10px}
+[data-theme="light"]{--bg:#f4f4f0;--surface:#ffffff;--surface2:#eeede8;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#1a1a18;--muted:#666;--accent:#4a7a10;--accent-dark:#3a6a00;--danger:#cc2200;--warning:#996600;--info:#1a5fa0}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;transition:background .2s,color .2s}
 .app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
-.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow-y:auto;transition:background .2s}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow-y:auto}
 .logo{display:flex;align-items:center;gap:10px}
 .logo-hex{width:30px;height:30px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);flex-shrink:0}
 .logo-name{font-size:14px;font-weight:700;color:var(--text)}
@@ -44,36 +29,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .budget-pill-label{font-size:9px;color:var(--muted);margin-bottom:3px;letter-spacing:.08em}
 .budget-pill-value{font-size:18px;font-weight:500;color:var(--accent)}
 .budget-pill-sub{font-size:9px;color:var(--muted);margin-top:2px}
-
-/* THEME TOGGLE */
 .theme-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border-radius:7px;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--surface2);transition:all .15s;font-family:var(--sans)}
 .theme-btn:hover{border-color:var(--border2);color:var(--text)}
 .theme-btn svg{width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
-.icon-sun{display:none}
-.icon-moon{display:block}
+.icon-sun{display:none}.icon-moon{display:block}
 [data-theme="light"] .icon-sun{display:block}
 [data-theme="light"] .icon-moon{display:none}
-
 .sync-row{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);color:var(--muted)}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
 .sync-dot.synced{background:var(--accent)}
 .sync-dot.syncing{background:var(--warning);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .main{padding:32px 36px;overflow-y:auto}
-.page{display:none}
-.page.active{display:block}
+.page{display:none}.page.active{display:block}
 .page-header{margin-bottom:28px}
 .page-title{font-size:24px;font-weight:700;margin-bottom:3px}
 .page-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
 .cards-grid{display:grid;gap:14px;margin-bottom:28px}
-.g3{grid-template-columns:repeat(3,1fr)}
-.g4{grid-template-columns:repeat(4,1fr)}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;transition:background .2s}
+.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
 .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border2)}
-.stat-card.cg::before{background:var(--accent)}
-.stat-card.cr::before{background:var(--danger)}
-.stat-card.cb::before{background:var(--info)}
-.stat-card.ca::before{background:var(--warning)}
+.stat-card.cg::before{background:var(--accent)}.stat-card.cr::before{background:var(--danger)}.stat-card.cb::before{background:var(--info)}.stat-card.ca::before{background:var(--warning)}
 .stat-label{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;margin-bottom:6px}
 .stat-value{font-size:26px;font-weight:700;font-family:var(--mono)}
 .sv-g{color:var(--accent)}.sv-r{color:var(--danger)}.sv-a{color:var(--warning)}
@@ -84,8 +60,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .section-meta{font-size:11px;font-family:var(--mono);color:var(--muted)}
 .add-btn{font-size:11px;font-weight:500;color:var(--accent);background:rgba(100,160,20,.08);border:1px solid rgba(100,160,20,.2);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
 .add-btn:hover{background:rgba(100,160,20,.15)}
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:background .2s}
-.tr{display:grid;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .12s}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.tr{display:grid;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);transition:background .12s}
 .tr:last-child{border-bottom:none}
 .tr:hover{background:var(--surface2)}
 .tr.hdr{background:var(--surface2);padding:7px 14px}
@@ -93,24 +69,33 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .cl{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em}
 .iname{font-size:12px;font-weight:500}
 .isub{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
-.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500;margin-top:3px}
-.bf{background:rgba(127,119,221,.15);color:#7f77dd;border:1px solid rgba(127,119,221,.25)}
-.bc{background:rgba(90,180,255,.12);color:#3a8fcc;border:1px solid rgba(90,180,255,.2)}
-.bv{background:rgba(100,160,20,.1);color:#4a8a10;border:1px solid rgba(100,160,20,.2)}
-.bk{background:rgba(180,120,10,.1);color:#996600;border:1px solid rgba(180,120,10,.2)}
-.bi{background:rgba(200,50,50,.1);color:#cc3333;border:1px solid rgba(200,50,50,.2)}
+.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500}
+
+/* Inline editable fields */
+.editable{background:transparent;border:1px solid transparent;color:var(--text);font-family:var(--sans);font-size:12px;font-weight:500;padding:3px 6px;border-radius:5px;width:100%;outline:none;transition:border-color .15s,background .15s;cursor:pointer}
+.editable:hover{border-color:var(--border2);background:var(--surface2)}
+.editable:focus{border-color:var(--accent);background:var(--surface2);cursor:text}
+.editable-num{background:transparent;border:1px solid transparent;color:var(--text);font-family:var(--mono);font-size:12px;padding:3px 6px;border-radius:5px;width:100%;outline:none;text-align:right;transition:border-color .15s,background .15s;cursor:pointer}
+.editable-num:hover{border-color:var(--border2);background:var(--surface2)}
+.editable-num:focus{border-color:var(--accent);background:var(--surface2);cursor:text}
+.editable-sel{background:transparent;border:1px solid transparent;color:var(--text);font-family:var(--mono);font-size:11px;padding:3px 5px;border-radius:5px;width:100%;outline:none;cursor:pointer;transition:border-color .15s,background .15s}
+.editable-sel:hover{border-color:var(--border2);background:var(--surface2)}
+.editable-sel:focus{border-color:var(--accent);background:var(--surface2)}
+.editable-sel option{background:var(--surface);color:var(--text)}
+.edit-hint{font-size:9px;color:var(--muted);font-family:var(--mono);padding:6px 14px;border-top:1px solid var(--border);opacity:.6}
+
+.bf{background:rgba(127,119,221,.15);color:#b08fff;border:1px solid rgba(127,119,221,.25)}
+.bc{background:rgba(90,180,255,.12);color:#5ab4ff;border:1px solid rgba(90,180,255,.2)}
+.bv{background:rgba(200,245,90,.1);color:#c8f55a;border:1px solid rgba(200,245,90,.2)}
+.bk{background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2)}
+.bi{background:rgba(255,92,92,.1);color:#ff8080;border:1px solid rgba(255,92,92,.2)}
 .bh{background:rgba(136,135,128,.12);color:#888;border:1px solid rgba(136,135,128,.2)}
-.ba{background:rgba(29,158,117,.12);color:#1a8060;border:1px solid rgba(29,158,117,.2)}
+.ba{background:rgba(29,158,117,.12);color:#5dcaa5;border:1px solid rgba(29,158,117,.2)}
 .bp{background:rgba(136,135,128,.12);color:#888;border:1px solid rgba(136,135,128,.2)}
-.bu{background:rgba(180,120,10,.1);color:#996600;border:1px solid rgba(180,120,10,.2)}
-[data-theme="dark"] .bf{color:#b08fff}
-[data-theme="dark"] .bc{color:#5ab4ff}
-[data-theme="dark"] .bv{color:#c8f55a}
-[data-theme="dark"] .bk{color:#f5a623}
-[data-theme="dark"] .bi{color:#ff8080}
-[data-theme="dark"] .ba{color:#5dcaa5}
-[data-theme="dark"] .bu{color:#f5a623}
-.del-btn{background:none;border:1px solid transparent;color:var(--muted);font-size:15px;cursor:pointer;border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.bu{background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2)}
+[data-theme="light"] .bf{color:#6040cc}[data-theme="light"] .bc{color:#1a5fa0}[data-theme="light"] .bv{color:#4a7a10}[data-theme="light"] .bk{color:#996600}[data-theme="light"] .bi{color:#cc2200}[data-theme="light"] .ba{color:#1a7055}[data-theme="light"] .bu{color:#996600}
+
+.del-btn{background:none;border:1px solid transparent;color:var(--muted);font-size:15px;cursor:pointer;border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
 .del-btn:hover{background:rgba(200,50,50,.1);color:var(--danger)}
 .empty-row{padding:24px 14px;font-size:12px;color:var(--muted);font-family:var(--mono);text-align:center}
 .alert{background:rgba(180,120,10,.06);border:1px solid rgba(180,120,10,.2);border-radius:8px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:var(--warning);margin-bottom:20px;line-height:1.6}
@@ -137,7 +122,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .btn-cancel:hover{color:var(--text)}
 .btn-confirm{background:var(--accent);border:none;color:#0f0f0f;font-size:12px;font-family:var(--sans);font-weight:700;padding:7px 18px;border-radius:7px;cursor:pointer}
 .btn-confirm:hover{background:var(--accent-dark)}
-[data-theme="light"] .btn-confirm{color:#ffffff}
+[data-theme="light"] .btn-confirm{color:#fff}
 .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:200;transition:opacity .5s}
 .loading-screen.hidden{opacity:0;pointer-events:none}
 .lhex{width:44px;height:44px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);animation:spin 2s linear infinite}
@@ -145,18 +130,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .ltext{font-family:var(--mono);font-size:12px;color:var(--muted)}
 .milestone-row{display:grid;grid-template-columns:1fr 90px 70px 90px 80px;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
 .milestone-row:last-child{border-bottom:none}
-.principle-row{display:grid;grid-template-columns:200px 1fr;gap:0}
 .principle-cell{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px}
-.principle-cell:nth-child(odd){font-weight:600;border-right:1px solid var(--border)}
-.principle-cell:nth-child(even){color:var(--muted)}
-.principle-row div:last-child,.principle-row div:nth-last-child(2){border-bottom:none}
 </style>
 </head>
 <body>
-<div class="loading-screen" id="loading">
-  <div class="lhex"></div>
-  <div class="ltext">Loading Service Hive...</div>
-</div>
+<div class="loading-screen" id="loading"><div class="lhex"></div><div class="ltext">Loading Service Hive...</div></div>
 
 <div class="app">
   <aside class="sidebar">
@@ -224,11 +202,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       <div class="section">
         <div class="section-header"><div class="section-title">Operating principles</div></div>
         <div class="table-wrap">
-          <div class="principle-row">
-            <div class="principle-cell">Every dollar is visible</div><div class="principle-cell">Dashboard reviewed every Monday morning. No exceptions.</div>
-            <div class="principle-cell">Tools must justify cost</div><div class="principle-cell">Every paid tool reviewed quarterly. Not linked to vendor onboarding or customer acquisition — cancel it.</div>
-            <div class="principle-cell">KPIs replace gut feel</div><div class="principle-cell">Every paid member has a KPI score updated weekly. Below 3.0 for 2 weeks = performance conversation.</div>
-            <div class="principle-cell" style="border-bottom:none">First $1,000 MRR is everything</div><div class="principle-cell" style="border-bottom:none">That proves the model. Revenue target: Month 3. Once there, everything accelerates.</div>
+          <div style="display:grid;grid-template-columns:200px 1fr">
+            <div class="principle-cell" style="font-weight:600;border-right:1px solid var(--border)">Every dollar is visible</div><div class="principle-cell" style="color:var(--muted)">Dashboard reviewed every Monday morning. No exceptions.</div>
+            <div class="principle-cell" style="font-weight:600;border-right:1px solid var(--border)">Tools must justify cost</div><div class="principle-cell" style="color:var(--muted)">Every paid tool reviewed quarterly. Not linked to vendor onboarding or acquisition — cancel it.</div>
+            <div class="principle-cell" style="font-weight:600;border-right:1px solid var(--border)">KPIs replace gut feel</div><div class="principle-cell" style="color:var(--muted)">Every paid member has a KPI score updated weekly. Below 3.0 for 2 weeks = performance conversation.</div>
+            <div class="principle-cell" style="font-weight:600;border-right:1px solid var(--border);border-bottom:none">First $1,000 MRR is everything</div><div class="principle-cell" style="color:var(--muted);border-bottom:none">That proves the model. Revenue target: Month 3. Once there, everything accelerates.</div>
           </div>
         </div>
       </div>
@@ -238,47 +216,53 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <div class="page" id="page-budget">
       <div class="page-header">
         <div class="page-title">Budget & expenses</div>
-        <div class="page-sub">All amounts CAD · USD→CAD at 1.37 · synced to Firebase Toronto</div>
+        <div class="page-sub">Click any name or amount to edit · changes save instantly to Firebase</div>
       </div>
       <div class="cards-grid g3">
         <div class="stat-card ca"><div class="stat-label">MONTHLY BURN</div><div class="stat-value sv-a" id="b-burn">—</div><div class="stat-sub">active only</div></div>
         <div class="stat-card cb"><div class="stat-label">TEAM PAYROLL</div><div class="stat-value sv-g" id="b-payroll">—</div><div class="stat-sub">paid members</div></div>
         <div class="stat-card cg"><div class="stat-label">TOOLS & INFRA</div><div class="stat-value sv-g" id="b-tools">—</div><div class="stat-sub">software + servers + comms</div></div>
       </div>
+
       <div class="section">
         <div class="section-header">
           <div class="section-title">Team & salaries</div>
           <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="te-total">—</span><button class="add-btn" onclick="openModal('teamExpense')">+ Add</button></div>
         </div>
         <div class="table-wrap">
-          <div class="tr hdr" style="grid-template-columns:1fr 100px 90px 60px 28px">
+          <div class="tr hdr" style="grid-template-columns:1fr 120px 110px 60px 28px">
             <div class="cl">NAME / ROLE</div><div class="cl">TYPE</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
           </div>
           <div id="te-list"></div>
+          <div class="edit-hint">Click any field to edit · Enter or click away to save</div>
         </div>
       </div>
+
       <div class="section">
         <div class="section-header">
           <div class="section-title">Tools & software</div>
           <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="tl-total">—</span><button class="add-btn" onclick="openModal('toolsExpense')">+ Add</button></div>
         </div>
         <div class="table-wrap">
-          <div class="tr hdr" style="grid-template-columns:1fr 1fr 90px 60px 28px">
+          <div class="tr hdr" style="grid-template-columns:1fr 1fr 110px 60px 28px">
             <div class="cl">TOOL / SERVICE</div><div class="cl">WHO USES IT</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
           </div>
           <div id="tl-list"></div>
+          <div class="edit-hint">Click any field to edit · Enter or click away to save</div>
         </div>
       </div>
+
       <div class="section">
         <div class="section-header">
           <div class="section-title">Infrastructure & communication</div>
           <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="inf-total">—</span><button class="add-btn" onclick="openModal('infraExpense')">+ Add</button></div>
         </div>
         <div class="table-wrap">
-          <div class="tr hdr" style="grid-template-columns:1fr 1fr 90px 60px 28px">
+          <div class="tr hdr" style="grid-template-columns:1fr 1fr 110px 60px 28px">
             <div class="cl">SERVICE</div><div class="cl">WHO MANAGES</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
           </div>
           <div id="inf-list"></div>
+          <div class="edit-hint">Click any field to edit · Enter or click away to save</div>
         </div>
       </div>
     </div>
@@ -287,7 +271,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <div class="page" id="page-team">
       <div class="page-header">
         <div class="page-title">Team registry</div>
-        <div class="page-sub">All team members · paid, volunteer & planned · pre-revenue stage</div>
+        <div class="page-sub">Click any field to edit · changes save instantly to Firebase</div>
       </div>
       <div class="cards-grid g4">
         <div class="stat-card cb"><div class="stat-label">TOTAL HEADCOUNT</div><div class="stat-value sv-g" id="t-total">—</div><div class="stat-sub">all statuses</div></div>
@@ -295,17 +279,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <div class="stat-card cg"><div class="stat-label">VOLUNTEER / EQUITY</div><div class="stat-value sv-g" id="t-vol">—</div><div class="stat-sub">sweat equity</div></div>
         <div class="stat-card"><div class="stat-label">MONTHLY PAYROLL</div><div class="stat-value sv-g" id="t-monthly">—</div><div class="stat-sub" id="t-annual-sub">$0 / yr</div></div>
       </div>
-      <div class="alert">Founder alert: All volunteer members are contributing without pay. Document sweat equity agreements in writing before revenue hits $5,000/month — equity % or future salary. Verbal agreements create legal and team trust risks as the company grows.</div>
+      <div class="alert">Founder alert: Document sweat equity agreements in writing before revenue hits $5,000/month — equity % or future salary. Verbal agreements create legal and team trust risks.</div>
       <div class="section">
         <div class="section-header">
           <div class="section-title">All team members</div>
           <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="tm-count">0 members</span><button class="add-btn" onclick="openModal('teamMember')">+ Add member</button></div>
         </div>
         <div class="table-wrap">
-          <div class="tr hdr" style="grid-template-columns:1.8fr 1fr 0.8fr 0.8fr 0.7fr 28px">
-            <div class="cl">NAME / ROLE</div><div class="cl">DEPT · TYPE</div><div class="cl">JOINED</div><div class="cl" style="text-align:right">PAY / MO</div><div class="cl">STATUS</div><div></div>
+          <div class="tr hdr" style="grid-template-columns:1.6fr 1fr 0.8fr 0.7fr 0.8fr 0.6fr 28px">
+            <div class="cl">NAME / ROLE</div><div class="cl">DEPT · TYPE</div><div class="cl">JOINED</div><div class="cl" style="text-align:right">PAY / MO</div><div class="cl">STATUS</div><div class="cl">REPORTS TO</div><div></div>
           </div>
           <div id="tm-list"></div>
+          <div class="edit-hint">Click any field to edit · Enter or click away to save</div>
         </div>
       </div>
     </div>
@@ -325,32 +310,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 </div>
 
 <script>
-// Theme toggle — runs before Firebase loads so no flash
 (function(){
-  const saved = localStorage.getItem('sh-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
+  const t=localStorage.getItem('sh-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
 })();
-
 function toggleTheme(){
-  const current = document.documentElement.getAttribute('data-theme');
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('sh-theme', next);
-  document.getElementById('theme-label').textContent = next === 'dark' ? 'Switch to day mode' : 'Switch to night mode';
+  const n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('sh-theme',n);
+  document.getElementById('theme-label').textContent=n==='dark'?'Switch to day mode':'Switch to night mode';
 }
 </script>
 
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import{getFirestore,collection,onSnapshot,addDoc,deleteDoc,doc,setDoc}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import{getFirestore,collection,onSnapshot,addDoc,deleteDoc,doc,setDoc,updateDoc}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const cfg={apiKey:"AIzaSyBjPc8z6pMMqr5ypK8dUQvK-uJmKew1EpE",authDomain:"servicehiveops.firebaseapp.com",projectId:"servicehiveops",storageBucket:"servicehiveops.firebasestorage.app",messagingSenderId:"619118167240",appId:"1:619118167240:web:fd865f762a5b1c15bad1fd"};
 const db=getFirestore(initializeApp(cfg));
 
-// Set correct toggle label on load
-document.getElementById('theme-label').textContent =
-  document.documentElement.getAttribute('data-theme') === 'light'
-    ? 'Switch to night mode' : 'Switch to day mode';
+document.getElementById('theme-label').textContent=document.documentElement.getAttribute('data-theme')==='light'?'Switch to night mode':'Switch to day mode';
 
 const SEED_TM=[
   {id:'tm1',name:'Nayem Hossain',role:'Founder / CEO',dept:'Executive',type:'founder',pay:0,joining:'2024-01-01',status:'active',reportsTo:'—',notes:'Sweat equity. No salary until $5K MRR.'},
@@ -391,20 +370,32 @@ function tryHide(){if(++loaded>=4){document.getElementById('loading').classList.
 
 async function seedIfEmpty(col,seeds){
   return new Promise(r=>{
-    const u=onSnapshot(collection(db,col),snap=>{
-      u();
-      if(snap.empty){Promise.all(seeds.map(({id,...d})=>setDoc(doc(db,col,id),d))).then(r);}else r();
-    });
+    const u=onSnapshot(collection(db,col),snap=>{u();if(snap.empty){Promise.all(seeds.map(({id,...d})=>setDoc(doc(db,col,id),d))).then(r);}else r();});
   });
 }
 
-function fmt(n){const v=Math.round(Number(n)*100)/100;return'$'+v.toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function fmt(n){return'$'+(Math.round(Number(n)*100)/100).toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:2});}
 function fmtI(n){return'$'+Math.round(Number(n)).toLocaleString();}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
 const TL={founder:'Founder',cofound:'Co-Founder',volunteer:'Volunteer',contract:'Contract',intern:'Intern/PT',tohire:'To Hire',fulltime:'Full-time',parttime:'Part-time',freelance:'Freelancer'};
 const TB={founder:'bf',cofound:'bc',volunteer:'bv',contract:'bk',intern:'bi',tohire:'bh',fulltime:'bc',parttime:'bv',freelance:'bk'};
 const SB={active:'ba',upcoming:'bu',planned:'bp'};
+
+// Debounce saves to avoid too many Firebase writes while typing
+const saveTimers={};
+function debounceSave(id,fn,delay=800){
+  clearTimeout(saveTimers[id]);
+  saveTimers[id]=setTimeout(fn,delay);
+}
+
+async function saveField(col,id,field,value){
+  sync('syncing','Saving...');
+  const fbMap={te:'expTeam',tl:'expTools',inf:'expInfra',tm:'teamMembers'};
+  await updateDoc(doc(db,fbMap[col]||col,id),{[field]:value});
+  sync('synced','Saved');
+  setTimeout(()=>sync('synced','Synced'),1500);
+}
 
 function totalBurn(){
   const te=S.te.filter(i=>i.status==='active').reduce((s,i)=>s+Number(i.amount),0);
@@ -415,37 +406,46 @@ function totalBurn(){
 
 function renderDash(){
   const{te,tl,inf,total}=totalBurn();
-  const runway=total>0?(5000/total).toFixed(1):'∞';
+  const rn=total>0?5000/total:999;
   document.getElementById('d-burn').textContent=fmtI(total);
   document.getElementById('d-annual').textContent=fmtI(total*12);
   document.getElementById('sb-burn').textContent=fmtI(total);
-  document.getElementById('sb-runway').textContent=runway==='∞'?'unlimited runway':runway+' months runway';
+  document.getElementById('sb-runway').textContent=rn>99?'unlimited runway':rn.toFixed(1)+' months runway';
   document.getElementById('be-val').textContent=fmtI(total);
   const active=S.tm.filter(m=>m.status==='active').length;
   const upcoming=S.tm.filter(m=>m.status==='upcoming').length;
   document.getElementById('d-team').textContent=active;
   document.getElementById('d-team-sub').textContent='active · +'+upcoming+' upcoming';
-  const rn=total>0?5000/total:999;
   document.getElementById('d-runway').textContent=rn>99?'∞':rn.toFixed(1)+' mo';
   document.getElementById('d-runway-card').className='stat-card '+(rn<3?'cr':rn<6?'ca':'cg');
   const t=total||1;
   document.getElementById('bm-rows').innerHTML=[
-    {l:'Team & salaries',v:te,c:'#5a9a20'},
-    {l:'Tools & software',v:tl,c:'#3a8fcc'},
-    {l:'Infra & comms',v:inf,c:'#cc8800'},
+    {l:'Team & salaries',v:te,c:'#5a9a20'},{l:'Tools & software',v:tl,c:'#3a8fcc'},{l:'Infra & comms',v:inf,c:'#cc8800'},
   ].map(r=>`<div class="bm-row"><div class="bm-label">${r.l}</div><div class="bm-bar"><div class="bm-fill" style="width:${Math.round((r.v/t)*100)}%;background:${r.c}"></div></div><div class="bm-val">${fmtI(r.v)} <span style="color:var(--muted);font-size:10px">${Math.round((r.v/t)*100)}%</span></div></div>`).join('');
 }
 
-function expRowHtml(item,section,cols){
+// Expense row with inline editing
+function expRow(item,col,cols){
   const{total}=totalBurn();
   const pct=Math.round((Number(item.amount)/(total||1))*100);
   const dim=item.status==='planned'?'opacity:.5':'';
+  const isTeam=col==='te';
+  const typeOpts=isTeam
+    ?['contract','intern','fulltime','parttime','tohire']
+    :['tool','subscription'];
+  const selOpts=typeOpts.map(t=>`<option value="${t}" ${item.type===t?'selected':''}>${TL[t]||t}</option>`).join('');
+  const col2=isTeam
+    ?`<select class="editable-sel" onchange="window.saveField('${col}','${item.id}','type',this.value)">${selOpts}</select>`
+    :`<input class="editable" value="${esc(item.users||'')}" placeholder="Who uses it" onchange="window.saveField('${col}','${item.id}','users',this.value)">`;
   return`<div class="tr" style="grid-template-columns:${cols};${dim}">
-    <div><div class="iname">${esc(item.name)}</div>${item.notes?`<div class="isub">${esc(item.notes)}</div>`:''}</div>
-    <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${esc(item.users||TL[item.type]||item.type||'')}</div>
-    <div style="text-align:right;font-family:var(--mono);font-size:13px">${fmt(item.amount)}</div>
+    <div>
+      <input class="editable" value="${esc(item.name)}" placeholder="Name" oninput="debounceSave('${col}-${item.id}-name',()=>window.saveField('${col}','${item.id}','name',this.value))">
+      ${item.notes?`<div class="isub">${esc(item.notes)}</div>`:''}
+    </div>
+    <div>${col2}</div>
+    <div><input class="editable-num" type="number" value="${Number(item.amount)}" min="0" step="0.01" oninput="debounceSave('${col}-${item.id}-amt',()=>window.saveField('${col}','${item.id}','amount',parseFloat(this.value)||0))"></div>
     <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted)">${pct}%</div>
-    <button class="del-btn" onclick="window.delItem('${item.id}','${section}')">×</button>
+    <button class="del-btn" onclick="window.delItem('${item.id}','${col}')">×</button>
   </div>`;
 }
 
@@ -458,10 +458,33 @@ function renderBudget(){
   document.getElementById('te-total').textContent=fmtI(teAll)+' / mo';
   document.getElementById('tl-total').textContent=fmtI(tl)+' / mo';
   document.getElementById('inf-total').textContent=fmtI(inf)+' / mo';
-  const c1='1fr 100px 90px 60px 28px',c2='1fr 1fr 90px 60px 28px';
-  document.getElementById('te-list').innerHTML=S.te.length?S.te.map(i=>expRowHtml(i,'te',c1)).join(''):'<div class="empty-row">No team expenses</div>';
-  document.getElementById('tl-list').innerHTML=S.tl.length?S.tl.map(i=>expRowHtml(i,'tl',c2)).join(''):'<div class="empty-row">No tools</div>';
-  document.getElementById('inf-list').innerHTML=S.inf.length?S.inf.map(i=>expRowHtml(i,'inf',c2)).join(''):'<div class="empty-row">No infrastructure</div>';
+  const c1='1fr 120px 110px 60px 28px',c2='1fr 1fr 110px 60px 28px';
+  document.getElementById('te-list').innerHTML=S.te.length?S.te.map(i=>expRow(i,'te',c1)).join(''):'<div class="empty-row">No team expenses — click + Add</div>';
+  document.getElementById('tl-list').innerHTML=S.tl.length?S.tl.map(i=>expRow(i,'tl',c2)).join(''):'<div class="empty-row">No tools — click + Add</div>';
+  document.getElementById('inf-list').innerHTML=S.inf.length?S.inf.map(i=>expRow(i,'inf',c2)).join(''):'<div class="empty-row">No infrastructure — click + Add</div>';
+}
+
+// Team row with inline editing
+function teamRow(m){
+  const typeOpts=['founder','cofound','volunteer','contract','intern','tohire','fulltime','parttime','freelance']
+    .map(t=>`<option value="${t}" ${m.type===t?'selected':''}>${TL[t]||t}</option>`).join('');
+  const statusOpts=['active','upcoming','planned']
+    .map(s=>`<option value="${s}" ${m.status===s?'selected':''}>${s}</option>`).join('');
+  return`<div class="tr" style="grid-template-columns:1.6fr 1fr 0.8fr 0.7fr 0.8fr 0.6fr 28px">
+    <div>
+      <input class="editable" value="${esc(m.name)}" placeholder="Name" oninput="debounceSave('tm-${m.id}-name',()=>window.saveField('tm','${m.id}','name',this.value))">
+      <input class="editable" value="${esc(m.role)}" placeholder="Role" style="font-size:10px;color:var(--muted);margin-top:2px" oninput="debounceSave('tm-${m.id}-role',()=>window.saveField('tm','${m.id}','role',this.value))">
+    </div>
+    <div>
+      <input class="editable" value="${esc(m.dept)}" placeholder="Dept" style="font-size:11px;color:var(--muted);margin-bottom:3px" oninput="debounceSave('tm-${m.id}-dept',()=>window.saveField('tm','${m.id}','dept',this.value))">
+      <select class="editable-sel" onchange="window.saveField('tm','${m.id}','type',this.value)">${typeOpts}</select>
+    </div>
+    <div><input class="editable" type="date" value="${(m.joining||'').substring(0,10)}" onchange="window.saveField('tm','${m.id}','joining',this.value)" style="font-size:11px;color:var(--muted)"></div>
+    <div><input class="editable-num" type="number" value="${Number(m.pay)||0}" min="0" placeholder="0" oninput="debounceSave('tm-${m.id}-pay',()=>window.saveField('tm','${m.id}','pay',parseFloat(this.value)||0))"></div>
+    <div><select class="editable-sel" onchange="window.saveField('tm','${m.id}','status',this.value)">${statusOpts}</select></div>
+    <div><input class="editable" value="${esc(m.reportsTo||'')}" placeholder="Reports to" style="font-size:11px;color:var(--muted)" oninput="debounceSave('tm-${m.id}-rep',()=>window.saveField('tm','${m.id}','reportsTo',this.value))"></div>
+    <button class="del-btn" onclick="window.delItem('${m.id}','tm')">×</button>
+  </div>`;
 }
 
 function renderTeam(){
@@ -478,15 +501,7 @@ function renderTeam(){
   document.getElementById('tm-count').textContent=S.tm.length+' members';
   const order=['active','upcoming','planned'];
   const sorted=[...S.tm].sort((a,b)=>order.indexOf(a.status)-order.indexOf(b.status));
-  document.getElementById('tm-list').innerHTML=sorted.length?sorted.map(m=>`
-    <div class="tr" style="grid-template-columns:1.8fr 1fr 0.8fr 0.8fr 0.7fr 28px">
-      <div><div class="iname">${esc(m.name)}</div><div class="isub">${esc(m.role)}</div>${m.notes?`<div class="isub" style="opacity:.6">${esc(m.notes)}</div>`:''}</div>
-      <div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${esc(m.dept)}</div><span class="badge ${TB[m.type]||'bv'}">${TL[m.type]||m.type}</span></div>
-      <div style="font-size:11px;font-family:var(--mono);color:var(--muted)">${(m.joining||'').substring(0,10)||'—'}</div>
-      <div style="text-align:right;font-family:var(--mono);font-size:12px">${Number(m.pay)>0?fmtI(m.pay):'—'}</div>
-      <div><span class="badge ${SB[m.status]||'bp'}">${m.status}</span></div>
-      <button class="del-btn" onclick="window.delItem('${m.id}','tm')">×</button>
-    </div>`).join(''):'<div class="empty-row">No team members</div>';
+  document.getElementById('tm-list').innerHTML=sorted.length?sorted.map(teamRow).join(''):'<div class="empty-row">No team members</div>';
 }
 
 const FORMS={
@@ -510,21 +525,21 @@ window.submitModal=async()=>{
   const gn=id=>{const e=document.getElementById(id);return e?Math.max(0,Number(e.value)||0):0;};
   if(!g('f-name')){document.getElementById('f-name')?.focus();return;}
   sync('syncing','Saving...');
-  const colMap={teamMember:'teamMembers',teamExpense:'te',toolsExpense:'tl',infraExpense:'inf'};
-  const fbColMap={teamMembers:'teamMembers',te:'expTeam',tl:'expTools',inf:'expInfra'};
-  const fbCol=fbColMap[colMap[modalMode]]||colMap[modalMode];
+  const fbMap={teamMember:'teamMembers',teamExpense:'expTeam',toolsExpense:'expTools',infraExpense:'expInfra'};
   let data={};
   if(modalMode==='teamMember') data={name:g('f-name'),role:g('f-role'),dept:g('f-dept'),type:g('f-type'),pay:gn('f-pay'),joining:g('f-joining'),status:g('f-status'),reportsTo:g('f-reports'),notes:g('f-notes'),createdAt:Date.now()};
   else if(modalMode==='teamExpense') data={name:g('f-name'),type:g('f-type'),amount:gn('f-amount'),status:g('f-status')};
   else data={name:g('f-name'),users:g('f-users'),amount:gn('f-amount'),status:'active',notes:g('f-notes')};
-  await addDoc(collection(db,fbCol),data);
+  await addDoc(collection(db,fbMap[modalMode]),data);
   window.closeModal();
 };
 window.delItem=async(id,col)=>{
   sync('syncing','Saving...');
-  const fbColMap={tm:'teamMembers',te:'expTeam',tl:'expTools',inf:'expInfra'};
-  await deleteDoc(doc(db,fbColMap[col]||col,id));
+  const fbMap={tm:'teamMembers',te:'expTeam',tl:'expTools',inf:'expInfra'};
+  await deleteDoc(doc(db,fbMap[col]||col,id));
 };
+window.saveField=saveField;
+window.debounceSave=debounceSave;
 window.showPage=(name,btn)=>{
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
