@@ -1,1 +1,523 @@
-# Business-Operation
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Hive — Operations Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f0f;--surface:#181818;--surface2:#222;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);--text:#f0ede8;--muted:#888;--accent:#c8f55a;--accent-dark:#a8d43a;--danger:#ff5c5c;--warning:#f5a623;--info:#5ab4ff;--mono:'DM Mono',monospace;--sans:'Syne',sans-serif;--radius:10px}
+html.light{--bg:#f5f5f0;--surface:#ffffff;--surface2:#f0efe9;--border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--text:#1a1a18;--muted:#777;--accent:#5a8a1a;--accent-dark:#4a7a10;--danger:#cc3333;--warning:#b87800;--info:#1a6faa}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:24px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-hex{width:30px;height:30px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);flex-shrink:0}
+.logo-name{font-size:14px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:9px;color:var(--muted);font-family:var(--mono);letter-spacing:.08em}
+.nav-label{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.1em;padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--surface2);color:var(--accent)}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.nav-item.active .nav-dot{box-shadow:0 0 6px var(--accent)}
+.nav-coming{opacity:.4;pointer-events:none}
+.coming-badge{font-size:8px;font-family:var(--mono);background:var(--surface2);color:var(--muted);padding:2px 5px;border-radius:4px;margin-left:auto;border:1px solid var(--border)}
+.sidebar-footer{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.budget-pill{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--mono)}
+.budget-pill-label{font-size:9px;color:var(--muted);margin-bottom:3px;letter-spacing:.08em}
+.budget-pill-value{font-size:18px;font-weight:500;color:var(--accent)}
+.budget-pill-sub{font-size:9px;color:var(--muted);margin-top:2px}
+.sync-row{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);color:var(--muted)}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.sync-dot.synced{background:var(--accent)}
+.sync-dot.syncing{background:var(--warning);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.theme-toggle{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:11px;font-weight:500;color:var(--muted);cursor:pointer;border:1px solid var(--border);background:var(--surface2);width:100%;transition:all .15s;font-family:var(--sans)}
+.theme-toggle:hover{border-color:var(--border2);color:var(--text)}
+.theme-icon{width:14px;height:14px;flex-shrink:0}
+html.light .theme-toggle .icon-moon{display:block}
+html.light .theme-toggle .icon-sun{display:none}
+html:not(.light) .theme-toggle .icon-moon{display:none}
+html:not(.light) .theme-toggle .icon-sun{display:block}
+.main{padding:32px 36px;overflow-y:auto}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:28px}
+.page-title{font-size:24px;font-weight:700;margin-bottom:3px}
+.page-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.cards-grid{display:grid;gap:14px;margin-bottom:28px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--border2)}
+.stat-card.cg::before{background:var(--accent)}
+.stat-card.cr::before{background:var(--danger)}
+.stat-card.cb::before{background:var(--info)}
+.stat-card.ca::before{background:var(--warning)}
+.stat-label{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;font-family:var(--mono)}
+.sv-g{color:var(--accent)}.sv-r{color:var(--danger)}.sv-a{color:var(--warning)}
+.stat-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.section{margin-bottom:32px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-title{font-size:12px;font-weight:600;letter-spacing:.04em}
+.section-meta{font-size:11px;font-family:var(--mono);color:var(--muted)}
+.add-btn{font-size:11px;font-weight:500;color:var(--accent);background:rgba(200,245,90,.08);border:1px solid rgba(200,245,90,.2);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .15s;font-family:var(--sans)}
+.add-btn:hover{background:rgba(200,245,90,.15)}
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.tr{display:grid;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background .12s}
+.tr:last-child{border-bottom:none}
+.tr:hover{background:var(--surface2)}
+.tr.hdr{background:var(--surface2);padding:7px 14px}
+.tr.hdr:hover{background:var(--surface2)}
+.cl{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em}
+.iname{font-size:12px;font-weight:500}
+.isub{font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500;margin-top:3px}
+.bf{background:rgba(127,119,221,.15);color:#b08fff;border:1px solid rgba(127,119,221,.25)}
+.bc{background:rgba(90,180,255,.12);color:#5ab4ff;border:1px solid rgba(90,180,255,.2)}
+.bv{background:rgba(200,245,90,.1);color:#c8f55a;border:1px solid rgba(200,245,90,.2)}
+.bk{background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2)}
+.bi{background:rgba(255,92,92,.1);color:#ff8080;border:1px solid rgba(255,92,92,.2)}
+.bh{background:rgba(136,135,128,.12);color:#888;border:1px solid rgba(136,135,128,.2)}
+.ba{background:rgba(29,158,117,.12);color:#5dcaa5;border:1px solid rgba(29,158,117,.2)}
+.bp{background:rgba(136,135,128,.12);color:#888;border:1px solid rgba(136,135,128,.2)}
+.bu{background:rgba(245,166,35,.1);color:#f5a623;border:1px solid rgba(245,166,35,.2)}
+.inline-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:11px;font-family:var(--mono);padding:3px 5px;border-radius:5px;width:100%;cursor:pointer;outline:none}
+.inline-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:12px;font-family:var(--mono);padding:3px 7px;border-radius:5px;width:100%;text-align:right;outline:none}
+.del-btn{background:none;border:1px solid transparent;color:var(--muted);font-size:15px;cursor:pointer;border-radius:5px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.del-btn:hover{background:rgba(255,92,92,.1);color:var(--danger)}
+.empty-row{padding:24px 14px;font-size:12px;color:var(--muted);font-family:var(--mono);text-align:center}
+.alert{background:rgba(245,166,35,.06);border:1px solid rgba(245,166,35,.2);border-radius:8px;padding:10px 14px;font-size:11px;font-family:var(--mono);color:#f5a623;margin-bottom:20px;line-height:1.6}
+.burn-meter{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:28px}
+.bm-title{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;margin-bottom:12px}
+.bm-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bm-label{font-size:11px;color:var(--muted);width:140px;flex-shrink:0;font-family:var(--mono)}
+.bm-bar{flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bm-fill{height:100%;border-radius:3px;transition:width .4s}
+.bm-val{font-size:11px;font-family:var(--mono);width:90px;text-align:right;flex-shrink:0}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:24px;width:420px;max-width:92vw;animation:mIn .18s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:18px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:.08em;margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;font-family:var(--sans);padding:8px 11px;border-radius:8px;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--surface)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn-cancel{background:none;border:1px solid var(--border2);color:var(--muted);font-size:12px;font-family:var(--sans);font-weight:500;padding:7px 14px;border-radius:7px;cursor:pointer}
+.btn-cancel:hover{color:var(--text)}
+.btn-confirm{background:var(--accent);border:none;color:#0f0f0f;font-size:12px;font-family:var(--sans);font-weight:700;padding:7px 18px;border-radius:7px;cursor:pointer}
+.btn-confirm:hover{background:var(--accent-dark)}
+.loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:200;transition:opacity .5s}
+.loading-screen.hidden{opacity:0;pointer-events:none}
+.lhex{width:44px;height:44px;background:var(--accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);animation:spin 2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ltext{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.milestone-row{display:grid;grid-template-columns:1fr 90px 70px 90px 80px;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.milestone-row:last-child{border-bottom:none}
+.principle-row{display:grid;grid-template-columns:200px 1fr;gap:0}
+.principle-cell{padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px}
+.principle-cell:nth-child(odd){font-weight:600;border-right:1px solid var(--border)}
+.principle-cell:nth-child(even){color:var(--muted)}
+.principle-row div:last-child,.principle-row div:nth-last-child(2){border-bottom:none}
+</style>
+</head>
+<body>
+<div class="loading-screen" id="loading">
+  <div class="lhex"></div>
+  <div class="ltext">Loading Service Hive...</div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-hex"></div>
+      <div><div class="logo-name">ServiceHive</div><div class="logo-sub">OPS PLATFORM</div></div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <div class="nav-label">MODULES</div>
+      <button class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-dot"></span>Dashboard</button>
+      <button class="nav-item" onclick="showPage('budget',this)"><span class="nav-dot"></span>Budget & expenses</button>
+      <button class="nav-item" onclick="showPage('team',this)"><span class="nav-dot"></span>Team registry</button>
+      <button class="nav-item nav-coming"><span class="nav-dot"></span>KPI tracker<span class="coming-badge">NEXT</span></button>
+      <button class="nav-item nav-coming"><span class="nav-dot"></span>Time log<span class="coming-badge">SOON</span></button>
+      <button class="nav-item nav-coming"><span class="nav-dot"></span>Invoices<span class="coming-badge">SOON</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="budget-pill">
+        <div class="budget-pill-label">MONTHLY BURN</div>
+        <div class="budget-pill-value" id="sb-burn">—</div>
+        <div class="budget-pill-sub" id="sb-runway">calculating...</div>
+      </div>
+      <button class="theme-toggle" onclick="window.toggleTheme()">
+        <svg class="theme-icon icon-sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3" y1="3" x2="4.5" y2="4.5"/><line x1="11.5" y1="11.5" x2="13" y2="13"/><line x1="13" y1="3" x2="11.5" y2="4.5"/><line x1="4.5" y1="11.5" x2="3" y2="13"/>
+        </svg>
+        <svg class="theme-icon icon-moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M13.5 10A6 6 0 0 1 6 2.5a6 6 0 1 0 7.5 7.5z"/>
+        </svg>
+        <span id="theme-label">Day mode</span>
+      </button>
+      <div class="sync-row">
+        <div class="sync-dot syncing" id="sync-dot"></div>
+        <span id="sync-label">Connecting...</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">ServiceHiveOps · Monday morning review · all amounts CAD · pre-revenue stage</div>
+      </div>
+      <div class="cards-grid g4">
+        <div class="stat-card ca"><div class="stat-label">MONTHLY BURN</div><div class="stat-value sv-a" id="d-burn">—</div><div class="stat-sub">CAD / month</div></div>
+        <div class="stat-card cb"><div class="stat-label">ANNUAL BURN</div><div class="stat-value sv-g" id="d-annual">—</div><div class="stat-sub">at current rate</div></div>
+        <div class="stat-card cg"><div class="stat-label">ACTIVE TEAM</div><div class="stat-value sv-g" id="d-team">—</div><div class="stat-sub" id="d-team-sub">members</div></div>
+        <div class="stat-card" id="d-runway-card"><div class="stat-label">RUNWAY</div><div class="stat-value sv-g" id="d-runway">—</div><div class="stat-sub">at $5,000 cash reserves</div></div>
+      </div>
+      <div class="burn-meter">
+        <div class="bm-title">BURN BREAKDOWN</div>
+        <div id="bm-rows"></div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">Revenue milestones</div></div>
+        <div class="table-wrap">
+          <div class="milestone-row" style="background:var(--surface2)">
+            <div class="cl">MILESTONE</div><div class="cl">TARGET (CAD)</div><div class="cl">VENDORS</div><div class="cl">AVG JOB VALUE</div><div class="cl">STATUS</div>
+          </div>
+          <div class="milestone-row"><div class="iname">First revenue</div><div style="font-family:var(--mono);font-size:12px">$500</div><div style="font-family:var(--mono);font-size:12px">10</div><div style="font-family:var(--mono);font-size:12px">$100</div><div><span class="badge bu">Pending</span></div></div>
+          <div class="milestone-row"><div class="iname">Break-even</div><div style="font-family:var(--mono);font-size:12px" id="be-val">—</div><div style="font-family:var(--mono);font-size:12px">20</div><div style="font-family:var(--mono);font-size:12px">$150</div><div><span class="badge bu">Pending</span></div></div>
+          <div class="milestone-row"><div class="iname">$2,000 MRR</div><div style="font-family:var(--mono);font-size:12px">$2,000</div><div style="font-family:var(--mono);font-size:12px">30</div><div style="font-family:var(--mono);font-size:12px">$170</div><div><span class="badge bp">Planned</span></div></div>
+          <div class="milestone-row"><div class="iname">$5,000 MRR — salary ready</div><div style="font-family:var(--mono);font-size:12px">$5,000</div><div style="font-family:var(--mono);font-size:12px">50</div><div style="font-family:var(--mono);font-size:12px">$190</div><div><span class="badge bp">Planned</span></div></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header"><div class="section-title">Operating principles</div></div>
+        <div class="table-wrap">
+          <div class="principle-row">
+            <div class="principle-cell">Every dollar is visible</div><div class="principle-cell">Dashboard reviewed every Monday morning. No exceptions.</div>
+            <div class="principle-cell">Tools must justify cost</div><div class="principle-cell">Every paid tool reviewed quarterly. Not linked to vendor onboarding or customer acquisition — cancel it.</div>
+            <div class="principle-cell">KPIs replace gut feel</div><div class="principle-cell">Every paid member has a KPI score updated weekly. Below 3.0 for 2 weeks = performance conversation.</div>
+            <div class="principle-cell" style="border-bottom:none">First $1,000 MRR is everything</div><div class="principle-cell" style="border-bottom:none">That proves the model. Revenue target: Month 3. Once there, everything accelerates.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUDGET -->
+    <div class="page" id="page-budget">
+      <div class="page-header">
+        <div class="page-title">Budget & expenses</div>
+        <div class="page-sub">All amounts CAD · USD→CAD at 1.37 · synced to Firebase Toronto</div>
+      </div>
+      <div class="cards-grid g3">
+        <div class="stat-card ca"><div class="stat-label">MONTHLY BURN</div><div class="stat-value sv-a" id="b-burn">—</div><div class="stat-sub">active only</div></div>
+        <div class="stat-card cb"><div class="stat-label">TEAM PAYROLL</div><div class="stat-value sv-g" id="b-payroll">—</div><div class="stat-sub">paid members</div></div>
+        <div class="stat-card cg"><div class="stat-label">TOOLS & INFRA</div><div class="stat-value sv-g" id="b-tools">—</div><div class="stat-sub">software + servers + comms</div></div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Team & salaries</div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="te-total">—</span><button class="add-btn" onclick="openModal('teamExpense')">+ Add</button></div>
+        </div>
+        <div class="table-wrap">
+          <div class="tr hdr" style="grid-template-columns:1fr 100px 90px 60px 28px">
+            <div class="cl">NAME / ROLE</div><div class="cl">TYPE</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
+          </div>
+          <div id="te-list"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Tools & software</div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="tl-total">—</span><button class="add-btn" onclick="openModal('toolsExpense')">+ Add</button></div>
+        </div>
+        <div class="table-wrap">
+          <div class="tr hdr" style="grid-template-columns:1fr 1fr 90px 60px 28px">
+            <div class="cl">TOOL / SERVICE</div><div class="cl">WHO USES IT</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
+          </div>
+          <div id="tl-list"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Infrastructure & communication</div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="inf-total">—</span><button class="add-btn" onclick="openModal('infraExpense')">+ Add</button></div>
+        </div>
+        <div class="table-wrap">
+          <div class="tr hdr" style="grid-template-columns:1fr 1fr 90px 60px 28px">
+            <div class="cl">SERVICE</div><div class="cl">WHO MANAGES</div><div class="cl" style="text-align:right">MONTHLY (CAD)</div><div class="cl" style="text-align:right">% BURN</div><div></div>
+          </div>
+          <div id="inf-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM -->
+    <div class="page" id="page-team">
+      <div class="page-header">
+        <div class="page-title">Team registry</div>
+        <div class="page-sub">All team members · paid, volunteer & planned · pre-revenue stage</div>
+      </div>
+      <div class="cards-grid g4">
+        <div class="stat-card cb"><div class="stat-label">TOTAL HEADCOUNT</div><div class="stat-value sv-g" id="t-total">—</div><div class="stat-sub">all statuses</div></div>
+        <div class="stat-card ca"><div class="stat-label">PAID MEMBERS</div><div class="stat-value sv-a" id="t-paid">—</div><div class="stat-sub" id="t-payroll-sub">$0 / mo</div></div>
+        <div class="stat-card cg"><div class="stat-label">VOLUNTEER / EQUITY</div><div class="stat-value sv-g" id="t-vol">—</div><div class="stat-sub">sweat equity</div></div>
+        <div class="stat-card"><div class="stat-label">MONTHLY PAYROLL</div><div class="stat-value sv-g" id="t-monthly">—</div><div class="stat-sub" id="t-annual-sub">$0 / yr</div></div>
+      </div>
+      <div class="alert">Founder alert: All volunteer members are contributing without pay. Document sweat equity agreements in writing before revenue hits $5,000/month — equity % or future salary. Verbal agreements create legal and team trust risks as the company grows.</div>
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">All team members</div>
+          <div style="display:flex;align-items:center;gap:10px"><span class="section-meta" id="tm-count">0 members</span><button class="add-btn" onclick="openModal('teamMember')">+ Add member</button></div>
+        </div>
+        <div class="table-wrap">
+          <div class="tr hdr" style="grid-template-columns:1.8fr 1fr 0.8fr 0.8fr 0.7fr 28px">
+            <div class="cl">NAME / ROLE</div><div class="cl">DEPT · TYPE</div><div class="cl">JOINED</div><div class="cl" style="text-align:right">PAY / MO</div><div class="cl">STATUS</div><div></div>
+          </div>
+          <div id="tm-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add</div>
+    <div id="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="submitModal()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import{getFirestore,collection,onSnapshot,addDoc,deleteDoc,doc,setDoc}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const cfg={apiKey:"AIzaSyBjPc8z6pMMqr5ypK8dUQvK-uJmKew1EpE",authDomain:"servicehiveops.firebaseapp.com",projectId:"servicehiveops",storageBucket:"servicehiveops.firebasestorage.app",messagingSenderId:"619118167240",appId:"1:619118167240:web:fd865f762a5b1c15bad1fd"};
+const db=getFirestore(initializeApp(cfg));
+
+const SEED_TM=[
+  {id:'tm1',name:'Nayem Hossain',role:'Founder / CEO',dept:'Executive',type:'founder',pay:0,joining:'2024-01-01',status:'active',reportsTo:'—',notes:'Sweat equity. No salary until $5K MRR.'},
+  {id:'tm2',name:'Tahsin Hossain',role:'Co-Founder / Lead Developer',dept:'Technology',type:'cofound',pay:0,joining:'2024-01-01',status:'active',reportsTo:'Nayem Hossain',notes:'Sweat equity. Pays own dev tools (~$43 USD/mo).'},
+  {id:'tm3',name:'Anichur Rahaman',role:'Tech Manager',dept:'Technology',type:'volunteer',pay:0,joining:'2024-03-01',status:'active',reportsTo:'Nayem Hossain',notes:'No salary. Sprint management & server ops.'},
+  {id:'tm4',name:'Umar Faruk',role:'UI / Graphic Designer',dept:'Design',type:'volunteer',pay:0,joining:'2024-03-01',status:'active',reportsTo:'Anichur Rahaman',notes:'No salary. Platform UI + marketing graphics.'},
+  {id:'tm5',name:'Faieq Haider',role:'Manual QA Engineer',dept:'Technology',type:'volunteer',pay:0,joining:'2024-04-01',status:'active',reportsTo:'Anichur Rahaman',notes:'No salary. Test cases, bug reporting, sign-off.'},
+  {id:'tm6',name:'Mohammad Ibrahim',role:'Cybersecurity Specialist',dept:'Technology',type:'volunteer',pay:0,joining:'2024-04-01',status:'active',reportsTo:'Anichur Rahaman',notes:'No salary. Security audit + PIPEDA compliance.'},
+  {id:'tm7',name:'Argha Das',role:'Automation QA Engineer',dept:'Technology',type:'volunteer',pay:0,joining:'2024-05-01',status:'upcoming',reportsTo:'Anichur Rahaman',notes:'No salary. Playwright + CI/CD integration.'},
+  {id:'tm8',name:'TBD',role:'Video Editor Intern',dept:'Marketing',type:'intern',pay:230,joining:'2024-05-01',status:'active',reportsTo:'Nayem Hossain',notes:'$230 CAD/month. Reels + short video content.'},
+  {id:'tm9',name:'TBD',role:'Business Dev Manager (BDM)',dept:'Sales',type:'contract',pay:450,joining:'2024-05-01',status:'active',reportsTo:'Nayem Hossain',notes:'$450 CAD/month. Vendor cold calls + onboarding.'},
+  {id:'tm10',name:'TBD',role:'Growth & Content Manager',dept:'Marketing',type:'tohire',pay:230,joining:'2024-07-01',status:'planned',reportsTo:'Nayem Hossain',notes:'$230 CAD/month. Social, SEO, content. Not hired yet.'},
+];
+const SEED_TE=[
+  {id:'te1',name:'Video Editor Intern',type:'intern',amount:230,status:'active'},
+  {id:'te2',name:'Business Dev Manager (BDM)',type:'contract',amount:450,status:'active'},
+  {id:'te3',name:'Growth & Content Mgr (TBD)',type:'tohire',amount:230,status:'planned'},
+];
+const SEED_TL=[
+  {id:'tl1',name:'ChatGPT (OpenAI)',users:'Tahsin (Co-Founder)',amount:27.4,status:'active',notes:'$23 USD/mo'},
+  {id:'tl2',name:'Cursor',users:'Tahsin (Co-Founder)',amount:43.35,status:'active',notes:'$20 USD/mo'},
+  {id:'tl3',name:'Claude AI',users:'Nayem (Founder)',amount:31.64,status:'active',notes:'$31.64 CAD/mo'},
+  {id:'tl4',name:'Zoom',users:'Whole team (8)',amount:25.98,status:'active'},
+  {id:'tl5',name:'Zoho Mail',users:'Whole team (8)',amount:14.11,status:'active',notes:'Annual $169.36 ÷ 12'},
+];
+const SEED_INF=[
+  {id:'inf1',name:'DigitalOcean Droplet #1',users:'Anichur (Tech Mgr)',amount:32.415,status:'active',notes:'Production server'},
+  {id:'inf2',name:'DigitalOcean Droplet #2',users:'Anichur (Tech Mgr)',amount:32.415,status:'active',notes:'Staging server'},
+  {id:'inf3',name:'Quophone (VoIP)',users:'BDM',amount:38,status:'active',notes:'Cold calling line'},
+];
+
+let S={tm:[],te:[],tl:[],inf:[]};
+let modalMode='';
+let loaded=0;
+
+function sync(s,l){document.getElementById('sync-dot').className='sync-dot '+s;document.getElementById('sync-label').textContent=l;}
+function tryHide(){if(++loaded>=4){document.getElementById('loading').classList.add('hidden');sync('synced','Synced');}}
+
+async function seedIfEmpty(col,seeds){
+  return new Promise(r=>{
+    const u=onSnapshot(collection(db,col),snap=>{
+      u();
+      if(snap.empty){Promise.all(seeds.map(({id,...d})=>setDoc(doc(db,col,id),d))).then(r);}else r();
+    });
+  });
+}
+
+function fmt(n){const v=Math.round(Number(n)*100)/100;return'$'+v.toLocaleString('en-CA',{minimumFractionDigits:0,maximumFractionDigits:2});}
+function fmtI(n){return'$'+Math.round(Number(n)).toLocaleString();}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+const TL={founder:'Founder',cofound:'Co-Founder',volunteer:'Volunteer',contract:'Contract',intern:'Intern/PT',tohire:'To Hire',fulltime:'Full-time',parttime:'Part-time',freelance:'Freelancer'};
+const TB={founder:'bf',cofound:'bc',volunteer:'bv',contract:'bk',intern:'bi',tohire:'bh',fulltime:'bc',parttime:'bv',freelance:'bk'};
+const SB={active:'ba',upcoming:'bu',planned:'bp'};
+
+function totalBurn(){
+  const te=S.te.filter(i=>i.status==='active').reduce((s,i)=>s+Number(i.amount),0);
+  const tl=S.tl.reduce((s,i)=>s+Number(i.amount),0);
+  const inf=S.inf.reduce((s,i)=>s+Number(i.amount),0);
+  return{te,tl,inf,total:te+tl+inf};
+}
+
+function renderDash(){
+  const{te,tl,inf,total}=totalBurn();
+  const runway=total>0?(5000/total).toFixed(1):'∞';
+  document.getElementById('d-burn').textContent=fmtI(total);
+  document.getElementById('d-annual').textContent=fmtI(total*12);
+  document.getElementById('sb-burn').textContent=fmtI(total);
+  document.getElementById('sb-runway').textContent=runway==='∞'?'unlimited runway':runway+' months runway';
+  document.getElementById('be-val').textContent=fmtI(total);
+  const active=S.tm.filter(m=>m.status==='active').length;
+  const upcoming=S.tm.filter(m=>m.status==='upcoming').length;
+  document.getElementById('d-team').textContent=active;
+  document.getElementById('d-team-sub').textContent='active · +'+upcoming+' upcoming';
+  const rn=total>0?5000/total:999;
+  document.getElementById('d-runway').textContent=rn>99?'∞':rn.toFixed(1)+' mo';
+  document.getElementById('d-runway-card').className='stat-card '+(rn<3?'cr':rn<6?'ca':'cg');
+  const t=total||1;
+  document.getElementById('bm-rows').innerHTML=[
+    {l:'Team & salaries',v:te,c:'#c8f55a'},
+    {l:'Tools & software',v:tl,c:'#5ab4ff'},
+    {l:'Infra & comms',v:inf,c:'#f5a623'},
+  ].map(r=>`<div class="bm-row"><div class="bm-label">${r.l}</div><div class="bm-bar"><div class="bm-fill" style="width:${Math.round((r.v/t)*100)}%;background:${r.c}"></div></div><div class="bm-val">${fmtI(r.v)} <span style="color:var(--muted);font-size:10px">${Math.round((r.v/t)*100)}%</span></div></div>`).join('');
+}
+
+function expRowHtml(item,section,cols){
+  const{total}=totalBurn();
+  const pct=Math.round((Number(item.amount)/(total||1))*100);
+  const dim=item.status==='planned'?'opacity:.5':'';
+  return`<div class="tr" style="grid-template-columns:${cols};${dim}">
+    <div><div class="iname">${esc(item.name)}</div>${item.notes?`<div class="isub">${esc(item.notes)}</div>`:''}</div>
+    <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${esc(item.users||TL[item.type]||item.type||'')}</div>
+    <div style="text-align:right;font-family:var(--mono);font-size:13px">${fmt(item.amount)}</div>
+    <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted)">${pct}%</div>
+    <button class="del-btn" onclick="window.delItem('${item.id}','${section}')">×</button>
+  </div>`;
+}
+
+function renderBudget(){
+  const{te,tl,inf,total}=totalBurn();
+  const teAll=S.te.reduce((s,i)=>s+Number(i.amount),0);
+  document.getElementById('b-burn').textContent=fmtI(total);
+  document.getElementById('b-payroll').textContent=fmtI(te);
+  document.getElementById('b-tools').textContent=fmtI(tl+inf);
+  document.getElementById('te-total').textContent=fmtI(teAll)+' / mo';
+  document.getElementById('tl-total').textContent=fmtI(tl)+' / mo';
+  document.getElementById('inf-total').textContent=fmtI(inf)+' / mo';
+  const c1='1fr 100px 90px 60px 28px',c2='1fr 1fr 90px 60px 28px';
+  document.getElementById('te-list').innerHTML=S.te.length?S.te.map(i=>expRowHtml(i,'te',c1)).join(''):'<div class="empty-row">No team expenses</div>';
+  document.getElementById('tl-list').innerHTML=S.tl.length?S.tl.map(i=>expRowHtml(i,'tl',c2)).join(''):'<div class="empty-row">No tools</div>';
+  document.getElementById('inf-list').innerHTML=S.inf.length?S.inf.map(i=>expRowHtml(i,'inf',c2)).join(''):'<div class="empty-row">No infrastructure</div>';
+}
+
+function renderTeam(){
+  const active=S.tm.filter(m=>m.status==='active');
+  const paid=active.filter(m=>Number(m.pay)>0);
+  const vol=S.tm.filter(m=>Number(m.pay)===0&&m.status!=='planned');
+  const payroll=paid.reduce((s,m)=>s+Number(m.pay),0);
+  document.getElementById('t-total').textContent=S.tm.length;
+  document.getElementById('t-paid').textContent=paid.length;
+  document.getElementById('t-payroll-sub').textContent=fmtI(payroll)+' / mo';
+  document.getElementById('t-vol').textContent=vol.length;
+  document.getElementById('t-monthly').textContent=fmtI(payroll);
+  document.getElementById('t-annual-sub').textContent=fmtI(payroll*12)+' / yr';
+  document.getElementById('tm-count').textContent=S.tm.length+' members';
+  const order=['active','upcoming','planned'];
+  const sorted=[...S.tm].sort((a,b)=>order.indexOf(a.status)-order.indexOf(b.status));
+  document.getElementById('tm-list').innerHTML=sorted.length?sorted.map(m=>`
+    <div class="tr" style="grid-template-columns:1.8fr 1fr 0.8fr 0.8fr 0.7fr 28px">
+      <div><div class="iname">${esc(m.name)}</div><div class="isub">${esc(m.role)}</div>${m.notes?`<div class="isub" style="opacity:.6">${esc(m.notes)}</div>`:''}</div>
+      <div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${esc(m.dept)}</div><span class="badge ${TB[m.type]||'bv'}">${TL[m.type]||m.type}</span></div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--muted)">${(m.joining||'').substring(0,10)||'—'}</div>
+      <div style="text-align:right;font-family:var(--mono);font-size:12px">${Number(m.pay)>0?fmtI(m.pay):'—'}</div>
+      <div><span class="badge ${SB[m.status]||'bp'}">${m.status}</span></div>
+      <button class="del-btn" onclick="window.delItem('${m.id}','tm')">×</button>
+    </div>`).join(''):'<div class="empty-row">No team members</div>';
+}
+
+const FORMS={
+  teamMember:`<div class="frow"><div class="field"><label>FULL NAME</label><input id="f-name" placeholder="e.g. John Smith"></div><div class="field"><label>ROLE / TITLE</label><input id="f-role" placeholder="e.g. Frontend Developer"></div></div><div class="frow"><div class="field"><label>DEPARTMENT</label><select id="f-dept"><option>Technology</option><option>Design</option><option>Marketing</option><option>Sales</option><option>Executive</option><option>Operations</option></select></div><div class="field"><label>TYPE</label><select id="f-type"><option value="volunteer">Volunteer</option><option value="founder">Founder</option><option value="cofound">Co-Founder</option><option value="contract">Contract</option><option value="intern">Intern/PT</option><option value="tohire">To Hire</option><option value="fulltime">Full-time</option></select></div></div><div class="frow"><div class="field"><label>MONTHLY PAY (CAD)</label><input type="number" id="f-pay" placeholder="0" min="0"></div><div class="field"><label>JOINING DATE</label><input type="date" id="f-joining"></div></div><div class="frow"><div class="field"><label>STATUS</label><select id="f-status"><option value="active">Active</option><option value="upcoming">Upcoming</option><option value="planned">Planned</option></select></div><div class="field"><label>REPORTS TO</label><input id="f-reports" placeholder="e.g. Nayem Hossain"></div></div><div class="field"><label>NOTES</label><input id="f-notes" placeholder="e.g. Sweat equity arrangement"></div>`,
+  teamExpense:`<div class="frow"><div class="field"><label>NAME / ROLE</label><input id="f-name" placeholder="e.g. Developer"></div><div class="field"><label>TYPE</label><select id="f-type"><option value="contract">Contract</option><option value="intern">Intern/PT</option><option value="fulltime">Full-time</option><option value="parttime">Part-time</option><option value="tohire">To Hire</option></select></div></div><div class="frow"><div class="field"><label>MONTHLY COST (CAD)</label><input type="number" id="f-amount" placeholder="0" min="0"></div><div class="field"><label>STATUS</label><select id="f-status"><option value="active">Active</option><option value="planned">Planned</option></select></div></div>`,
+  toolsExpense:`<div class="field"><label>TOOL / SERVICE</label><input id="f-name" placeholder="e.g. Slack"></div><div class="frow"><div class="field"><label>WHO USES IT</label><input id="f-users" placeholder="e.g. Whole team"></div><div class="field"><label>MONTHLY COST (CAD)</label><input type="number" id="f-amount" placeholder="0" min="0"></div></div><div class="field"><label>NOTES (optional)</label><input id="f-notes" placeholder="e.g. Annual billing ÷ 12"></div>`,
+  infraExpense:`<div class="field"><label>SERVICE NAME</label><input id="f-name" placeholder="e.g. DigitalOcean"></div><div class="frow"><div class="field"><label>WHO MANAGES IT</label><input id="f-users" placeholder="e.g. Anichur"></div><div class="field"><label>MONTHLY COST (CAD)</label><input type="number" id="f-amount" placeholder="0" min="0"></div></div><div class="field"><label>NOTES (optional)</label><input id="f-notes" placeholder="e.g. Production server"></div>`,
+};
+const FTITLES={teamMember:'Add team member',teamExpense:'Add team expense',toolsExpense:'Add tool / software',infraExpense:'Add infrastructure'};
+const FCOLS={te:'expTeam→te',tl:'expTools→tl',inf:'expInfra→inf',tm:'teamMembers→tm'};
+
+window.openModal=mode=>{
+  modalMode=mode;
+  document.getElementById('modal-title').textContent=FTITLES[mode]||'Add';
+  document.getElementById('modal-body').innerHTML=FORMS[mode]||'';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>{const f=document.getElementById('f-name');if(f)f.focus();},80);
+};
+window.closeModal=()=>document.getElementById('modal').classList.remove('open');
+window.submitModal=async()=>{
+  const g=id=>{const e=document.getElementById(id);return e?e.value.trim():'';};
+  const gn=id=>{const e=document.getElementById(id);return e?Math.max(0,Number(e.value)||0):0;};
+  if(!g('f-name')){document.getElementById('f-name')?.focus();return;}
+  sync('syncing','Saving...');
+  const colMap={teamMember:'teamMembers',teamExpense:'te',toolsExpense:'tl',infraExpense:'inf'};
+  const colName=colMap[modalMode];
+  const fbColMap={teamMembers:'teamMembers',te:'expTeam',tl:'expTools',inf:'expInfra'};
+  const fbCol=fbColMap[colName]||colName;
+  let data={};
+  if(modalMode==='teamMember') data={name:g('f-name'),role:g('f-role'),dept:g('f-dept'),type:g('f-type'),pay:gn('f-pay'),joining:g('f-joining'),status:g('f-status'),reportsTo:g('f-reports'),notes:g('f-notes'),createdAt:Date.now()};
+  else if(modalMode==='teamExpense') data={name:g('f-name'),type:g('f-type'),amount:gn('f-amount'),status:g('f-status')};
+  else data={name:g('f-name'),users:g('f-users'),amount:gn('f-amount'),status:'active',notes:g('f-notes')};
+  await addDoc(collection(db,fbCol),data);
+  window.closeModal();
+};
+window.delItem=async(id,col)=>{
+  sync('syncing','Saving...');
+  const fbColMap={tm:'teamMembers',te:'expTeam',tl:'expTools',inf:'expInfra'};
+  await deleteDoc(doc(db,fbColMap[col]||col,id));
+};
+window.showPage=(name,btn)=>{
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+};
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget)window.closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')window.closeModal();if(e.key==='Enter'&&document.getElementById('modal').classList.contains('open'))window.submitModal();});
+
+async function init(){
+  sync('syncing','Connecting...');
+  await Promise.all([
+    seedIfEmpty('teamMembers',SEED_TM),
+    seedIfEmpty('expTeam',SEED_TE),
+    seedIfEmpty('expTools',SEED_TL),
+    seedIfEmpty('expInfra',SEED_INF),
+  ]);
+  onSnapshot(collection(db,'teamMembers'),snap=>{S.tm=snap.docs.map(d=>({id:d.id,...d.data()}));renderTeam();renderDash();tryHide();});
+  onSnapshot(collection(db,'expTeam'),snap=>{S.te=snap.docs.map(d=>({id:d.id,...d.data()}));renderBudget();renderDash();tryHide();});
+  onSnapshot(collection(db,'expTools'),snap=>{S.tl=snap.docs.map(d=>({id:d.id,...d.data()}));renderBudget();renderDash();tryHide();});
+  onSnapshot(collection(db,'expInfra'),snap=>{S.inf=snap.docs.map(d=>({id:d.id,...d.data()}));renderBudget();renderDash();tryHide();});
+}
+// Theme
+function applyTheme(mode){
+  if(mode==='light'){document.documentElement.classList.add('light');document.getElementById('theme-label').textContent='Night mode';}
+  else{document.documentElement.classList.remove('light');document.getElementById('theme-label').textContent='Day mode';}
+  localStorage.setItem('sh-theme',mode);
+}
+window.toggleTheme=()=>applyTheme(document.documentElement.classList.contains('light')?'dark':'light');
+applyTheme(localStorage.getItem('sh-theme')||'dark');
+
+init();
+</script>
+</body>
+</html>
